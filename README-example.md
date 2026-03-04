@@ -14,3 +14,9 @@ I am planning to add **Monopoly Deal** as a Card Game.
   - [ ] 3/2 Ambitious: Deal Breaker!! (hard, not necessary, but the game is better because of it) Add House/Hotel subclasses (kinda boring), Just Say No
 
 
+<<<<<<< HEAD
+=======
+  My project is a simple two-player card game made in Processing/Java. I built a reusable card-game framework with classes for cards, hands, and clickable UI elements. Using inheritance, my Card objects and on-screen buttons share a superclass (ClickableRectangle) for position and click detection. I then created a new game called Snaps by subclassing CardGame. In Snaps, players flip cards into a center pile and can press a Snap button at any time. If two consecutive cards match and the player snaps, they win; if they snap when there is no match, they lose. The computer plays automatically with a short delay to simulate “thinking.”
+
+
+>>>>>>> de50e1d (finished proj)

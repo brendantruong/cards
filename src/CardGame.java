@@ -1,10 +1,10 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 import processing.core.PApplet;
 
 public class CardGame {
-    // Core game components
     ArrayList<Card> deck = new ArrayList<>();
     Hand playerOneHand;
     Hand playerTwoHand;
@@ -12,12 +12,10 @@ public class CardGame {
     Card selectedCard;
     int selectedCardRaiseAmount = 15;
 
-    // Game state
     boolean playerOneTurn = true;
     Card lastPlayedCard;
     boolean gameActive;
 
-    // UI
     ClickableRectangle drawButton;
     int drawButtonX = 250;
     int drawButtonY = 400;
@@ -30,7 +28,6 @@ public class CardGame {
     }
 
     protected void initializeGame() {
-        // Initialize draw button
         drawButton = new ClickableRectangle();
         drawButton.x = drawButtonX;
         drawButton.y = drawButtonY;
@@ -38,7 +35,6 @@ public class CardGame {
         drawButton.height = drawButtonHeight;
         drawButton.text = "Draw";
 
-        // Initialize decks and hands
         deck = new ArrayList<>();
         discardPile = new ArrayList<>();
         playerOneHand = new Hand();
@@ -49,18 +45,20 @@ public class CardGame {
     }
 
     protected void createDeck() {
-        // Create a standard deck of cards (for simplicity, using numbers and suits)
         String[] suits = { "Hearts", "Diamonds", "Clubs", "Spades" };
         String[] values = { "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
+
         for (String suit : suits) {
             for (String value : values) {
                 deck.add(new Card(value, suit));
             }
         }
+        Collections.shuffle(deck, new Random());
     }
 
     protected void dealCards(int numCards) {
         Collections.shuffle(deck);
+
         for (int i = 0; i < numCards; i++) {
             playerOneHand.addCard(deck.remove(0));
             Card card = deck.remove(0);
@@ -68,7 +66,6 @@ public class CardGame {
             playerTwoHand.addCard(card);
         }
 
-        // position cards
         playerOneHand.positionCards(50, 450, 80, 120, 20);
         playerTwoHand.positionCards(50, 50, 80, 120, 20);
     }
@@ -81,7 +78,6 @@ public class CardGame {
         if (deck != null && !deck.isEmpty()) {
             hand.addCard(deck.remove(0));
         } else if (discardPile != null && discardPile.size() > 1) {
-            // Reshuffle discard pile into deck if deck is empty
             lastPlayedCard = discardPile.remove(discardPile.size() - 1);
             deck.addAll(discardPile);
             discardPile.clear();
@@ -97,32 +93,30 @@ public class CardGame {
     public void handleDrawButtonClick(int mouseX, int mouseY) {
         if (drawButton.isClicked(mouseX, mouseY) && playerOneTurn) {
             drawCard(playerOneHand);
-            // Switch turns after drawing
             switchTurns();
         }
     }
 
     public boolean playCard(Card card, Hand hand) {
-        // Check if card is valid to play
         if (!isValidPlay(card)) {
             System.out.println("Invalid play: " + card.value + " of " + card.suit);
             return false;
         }
-        // Remove card from hand
+
         hand.removeCard(card);
         card.setTurned(false);
-        // Add to discard pile
+
         discardPile.add(card);
         lastPlayedCard = card;
-        // Switch turns
+
         switchTurns();
         return true;
     }
 
     public void switchTurns() {
         playerOneTurn = !playerOneTurn;
-        playerOneHand.positionCards(50, 450, 80, 120, 20);
-        playerTwoHand.positionCards(50, 50, 80, 120, 20);
+        playerOneHand.positionCards(50, 560, 80, 120, 20);
+        playerTwoHand.positionCards(50, 120, 80, 120, 20);
     }
 
     public String getCurrentPlayer() {
@@ -151,14 +145,11 @@ public class CardGame {
     }
 
     public void handleCardClick(int mouseX, int mouseY) {
-        if (!playerOneTurn) {
-            return;
-        }
+        if (!playerOneTurn) return;
+
         Card clickedCard = getClickedCard(mouseX, mouseY);
-        if (clickedCard == null) {
-            return;
-        }
-        // this is for the first time
+        if (clickedCard == null) return;
+
         if (selectedCard == null) {
             selectedCard = clickedCard;
             selectedCard.setSelected(true, selectedCardRaiseAmount);
@@ -166,32 +157,26 @@ public class CardGame {
         }
 
         if (selectedCard == clickedCard) {
-            System.out.println("playing card: " + selectedCard.value + " of " + selectedCard.suit);
             if (playCard(selectedCard, playerOneHand)) {
                 selectedCard.setSelected(false, selectedCardRaiseAmount);
                 selectedCard = null;
             }
             return;
         }
-        // change selection
+
         selectedCard.setSelected(false, selectedCardRaiseAmount);
         selectedCard = clickedCard;
         selectedCard.setSelected(true, selectedCardRaiseAmount);
     }
 
-    // return the card that is clicked!
     public Card getClickedCard(int mouseX, int mouseY) {
         for (int i = playerOneHand.getSize() - 1; i >= 0; i--) {
             Card card = playerOneHand.getCard(i);
-            if (card != null && card.isClicked(mouseX, mouseY)) {
-                return card;
-            }
+            if (card != null && card.isClicked(mouseX, mouseY)) return card;
         }
         return null;
     }
 
     public void drawChoices(PApplet app) {
-        // this method is available for overriding
-        // if you want to draw additional things (like Uno's wild color choices)
     }
 }
